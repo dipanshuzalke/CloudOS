@@ -1,0 +1,37 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.core.database import Base, engine
+from app.models import VM, Task
+from app.routes import vms, tasks
+
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="Cloud Infrastructure Management Platform",
+    version="1.0.0"
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:8080",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+app.include_router(vms.router)
+app.include_router(tasks.router)
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "Cloud Infrastructure API is running"
+    }

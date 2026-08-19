@@ -1,16 +1,22 @@
-export type VMStatus = "running" | "stopped" | "provisioning" | "degraded";
+export type VMStatus =
+  | "running"
+  | "stopped"
+  | "provisioning"
+  | "degraded";
 
 export interface VirtualMachine {
   id: string;
   name: string;
   status: VMStatus;
+
   cpu: number;
   ram: number;
   storage: number;
-  os: string;
-  region: string;
-  ip: string;
-  uptime: string;
+
+  os?: string;
+  region?: string;
+  ip?: string;
+  uptime?: string;
 }
 
 export const virtualMachines: VirtualMachine[] = [
