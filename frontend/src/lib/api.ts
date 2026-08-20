@@ -1,4 +1,4 @@
-import type { VirtualMachine } from "@/features/cloud/data";
+import type { VirtualMachine, VMStatus } from "@/features/cloud/data";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -10,16 +10,29 @@ const API_URL =
 export interface VMFromAPI {
   id: number;
   name: string;
+
+  status: string;
+
   cpu: number;
   ram: number;
   storage: number;
-  status: string;
+
+  os: string;
+  region: string;
+
+  ip: string | null;
+  uptime: string | null;
+
+  container_id: string | null;
+
   created_at: string;
 }
 
 export interface CreateVMRequest {
   name: string;
   cpu: number;
+  os: string;
+  region: string;
   ram: number;
   storage: number;
 }
@@ -59,14 +72,14 @@ export async function getVMs(): Promise<VMFromAPI[]> {
 
 
 export async function createVM(
-  vm: CreateVMRequest
+  data: CreateVMRequest
 ): Promise<VMFromAPI> {
   const response = await fetch(`${API_URL}/api/vms`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(vm),
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) {
@@ -100,6 +113,64 @@ export async function deleteVM(vmId: number) {
   return response.json();
 }
 
+export async function startVM(id: number): Promise<VMFromAPI> {
+  const response = await fetch(
+    `${API_URL}/api/vms/${id}/start`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+
+    throw new Error(
+      error || "Failed to start VM"
+    );
+  }
+
+  return response.json();
+}
+
+
+export async function stopVM(id: number): Promise<VMFromAPI> {
+  const response = await fetch(
+    `${API_URL}/api/vms/${id}/stop`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+
+    throw new Error(
+      error || "Failed to stop VM"
+    );
+  }
+
+  return response.json();
+}
+
+
+export async function restartVM(id: number): Promise<VMFromAPI> {
+  const response = await fetch(
+    `${API_URL}/api/vms/${id}/restart`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+
+    throw new Error(
+      error || "Failed to restart VM"
+    );
+  }
+
+  return response.json();
+}
 
 /* =========================================================
    TASK API
@@ -163,34 +234,50 @@ export async function deleteTask(taskId: number) {
    VM MAPPER
 ========================================================= */
 
-const statusMap: Record<
-  string,
-  VirtualMachine["status"]
-> = {
-  running: "running",
-  stopped: "stopped",
-  provisioning: "provisioning",
-  degraded: "degraded",
-};
+export function mapVM(vm: VMFromAPI): VirtualMachine {
+  let status: VMStatus;
 
+  switch (vm.status) {
+    case "running":
+      status = "running";
+      break;
 
-export function mapVM(
-  vm: VMFromAPI
-): VirtualMachine {
+    case "stopped":
+      status = "stopped";
+      break;
+
+    case "provisioning":
+      status = "provisioning";
+      break;
+
+    case "degraded":
+      status = "degraded";
+      break;
+
+    default:
+      status = "degraded";
+  }
+
   return {
-    id: String(vm.id),
+    id: `vm-${String(vm.id).padStart(2, "0")}`,
+
+    // IMPORTANT
+    backendId: vm.id,
+
     name: vm.name,
 
-    status: statusMap[vm.status] ?? "stopped",
+    status,
 
     cpu: vm.cpu,
     ram: vm.ram,
     storage: vm.storage,
 
-    // Phase 2 does not have real infrastructure metadata yet.
-    os: "—",
-    region: "Local",
-    ip: "—",
-    uptime: "—",
+    os: vm.os,
+    region: vm.region,
+
+    ip: vm.ip ?? "Not assigned",
+    uptime: vm.uptime ?? "—",
+
+    containerId: vm.container_id ?? undefined,
   };
 }

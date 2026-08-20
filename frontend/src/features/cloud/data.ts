@@ -6,32 +6,39 @@ export type VMStatus =
 
 export interface VirtualMachine {
   id: string;
+
+  // Real PostgreSQL ID
+  backendId: number;
+
   name: string;
+
   status: VMStatus;
 
   cpu: number;
   ram: number;
   storage: number;
 
-  os?: string;
-  region?: string;
-  ip?: string;
-  uptime?: string;
+  os: string;
+  region: string;
+  ip: string;
+  uptime: string;
+
+  containerId?: string;
 }
 
 export const virtualMachines: VirtualMachine[] = [
-  { id: "vm-01", name: "atlas-edge-01", status: "running", cpu: 62, ram: 48, storage: 71, os: "Ubuntu 22.04 LTS", region: "us-east-1", ip: "10.24.8.11", uptime: "18d 04h" },
-  { id: "vm-02", name: "atlas-edge-02", status: "running", cpu: 44, ram: 39, storage: 52, os: "Ubuntu 22.04 LTS", region: "us-east-1", ip: "10.24.8.12", uptime: "18d 04h" },
-  { id: "vm-03", name: "helios-compute-a", status: "running", cpu: 81, ram: 74, storage: 63, os: "Debian 12", region: "eu-west-2", ip: "10.31.2.7", uptime: "9d 21h" },
-  { id: "vm-04", name: "helios-compute-b", status: "degraded", cpu: 93, ram: 88, storage: 79, os: "Debian 12", region: "eu-west-2", ip: "10.31.2.8", uptime: "9d 21h" },
-  { id: "vm-05", name: "nimbus-worker-01", status: "running", cpu: 37, ram: 41, storage: 34, os: "Alpine 3.19", region: "ap-south-1", ip: "10.44.6.21", uptime: "31d 12h" },
-  { id: "vm-06", name: "nimbus-worker-02", status: "running", cpu: 29, ram: 33, storage: 30, os: "Alpine 3.19", region: "ap-south-1", ip: "10.44.6.22", uptime: "31d 12h" },
-  { id: "vm-07", name: "orion-batch-01", status: "provisioning", cpu: 12, ram: 18, storage: 22, os: "Rocky Linux 9", region: "us-west-2", ip: "10.12.9.4", uptime: "—" },
-  { id: "vm-08", name: "orion-batch-02", status: "running", cpu: 58, ram: 52, storage: 44, os: "Rocky Linux 9", region: "us-west-2", ip: "10.12.9.5", uptime: "4d 07h" },
-  { id: "vm-09", name: "vega-stream-01", status: "running", cpu: 67, ram: 61, storage: 58, os: "Ubuntu 24.04 LTS", region: "eu-central-1", ip: "10.58.3.16", uptime: "12d 03h" },
-  { id: "vm-10", name: "vega-stream-02", status: "stopped", cpu: 0, ram: 0, storage: 41, os: "Ubuntu 24.04 LTS", region: "eu-central-1", ip: "10.58.3.17", uptime: "—" },
-  { id: "vm-11", name: "lyra-cache-01", status: "running", cpu: 51, ram: 69, storage: 26, os: "Ubuntu 22.04 LTS", region: "us-east-1", ip: "10.24.8.31", uptime: "22d 18h" },
-  { id: "vm-12", name: "pulsar-ml-01", status: "running", cpu: 88, ram: 79, storage: 84, os: "Ubuntu 22.04 LTS", region: "us-west-2", ip: "10.12.9.44", uptime: "6d 15h" },
+  // { id: "vm-01", name: "atlas-edge-01", status: "running", cpu: 62, ram: 48, storage: 71, os: "Ubuntu 22.04 LTS", region: "us-east-1", ip: "10.24.8.11", uptime: "18d 04h" },
+  // { id: "vm-02", name: "atlas-edge-02", status: "running", cpu: 44, ram: 39, storage: 52, os: "Ubuntu 22.04 LTS", region: "us-east-1", ip: "10.24.8.12", uptime: "18d 04h" },
+  // { id: "vm-03", name: "helios-compute-a", status: "running", cpu: 81, ram: 74, storage: 63, os: "Debian 12", region: "eu-west-2", ip: "10.31.2.7", uptime: "9d 21h" },
+  // { id: "vm-04", name: "helios-compute-b", status: "degraded", cpu: 93, ram: 88, storage: 79, os: "Debian 12", region: "eu-west-2", ip: "10.31.2.8", uptime: "9d 21h" },
+  // { id: "vm-05", name: "nimbus-worker-01", status: "running", cpu: 37, ram: 41, storage: 34, os: "Alpine 3.19", region: "ap-south-1", ip: "10.44.6.21", uptime: "31d 12h" },
+  // { id: "vm-06", name: "nimbus-worker-02", status: "running", cpu: 29, ram: 33, storage: 30, os: "Alpine 3.19", region: "ap-south-1", ip: "10.44.6.22", uptime: "31d 12h" },
+  // { id: "vm-07", name: "orion-batch-01", status: "provisioning", cpu: 12, ram: 18, storage: 22, os: "Rocky Linux 9", region: "us-west-2", ip: "10.12.9.4", uptime: "—" },
+  // { id: "vm-08", name: "orion-batch-02", status: "running", cpu: 58, ram: 52, storage: 44, os: "Rocky Linux 9", region: "us-west-2", ip: "10.12.9.5", uptime: "4d 07h" },
+  // { id: "vm-09", name: "vega-stream-01", status: "running", cpu: 67, ram: 61, storage: 58, os: "Ubuntu 24.04 LTS", region: "eu-central-1", ip: "10.58.3.16", uptime: "12d 03h" },
+  // { id: "vm-10", name: "vega-stream-02", status: "stopped", cpu: 0, ram: 0, storage: 41, os: "Ubuntu 24.04 LTS", region: "eu-central-1", ip: "10.58.3.17", uptime: "—" },
+  // { id: "vm-11", name: "lyra-cache-01", status: "running", cpu: 51, ram: 69, storage: 26, os: "Ubuntu 22.04 LTS", region: "us-east-1", ip: "10.24.8.31", uptime: "22d 18h" },
+  // { id: "vm-12", name: "pulsar-ml-01", status: "running", cpu: 88, ram: 79, storage: 84, os: "Ubuntu 22.04 LTS", region: "us-west-2", ip: "10.12.9.44", uptime: "6d 15h" },
 ];
 
 export type TaskState = "running" | "queued" | "completed" | "failed";

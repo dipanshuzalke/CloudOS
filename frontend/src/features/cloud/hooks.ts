@@ -8,6 +8,9 @@ import {
   createTask,
   createVM,
   deleteTask,
+  startVM,
+  stopVM,
+  restartVM,
   deleteVM,
   getTasks,
   getVMs,
@@ -54,6 +57,48 @@ export function useDeleteVM() {
 
   return useMutation({
     mutationFn: deleteVM,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["vms"],
+      });
+    },
+  });
+}
+
+export function useStartVM() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => startVM(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["vms"],
+      });
+    },
+  });
+}
+
+export function useStopVM() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => stopVM(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["vms"],
+      });
+    },
+  });
+}
+
+export function useRestartVM() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => restartVM(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
