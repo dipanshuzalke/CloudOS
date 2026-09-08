@@ -19,7 +19,7 @@ import {
 import type { TaskFromAPI } from "@/lib/api";
 
 
-export const Route = createFileRoute("/os/tasks")({
+export const Route = createFileRoute("/_authenticated/os/tasks")({
   head: () => ({
     meta: [
       {

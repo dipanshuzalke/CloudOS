@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/os/shell";
 import { Reveal } from "@/components/motion/reveal";
 import { algorithms } from "@/features/cloud/data";
 
-export const Route = createFileRoute("/os/scheduler")({
+export const Route = createFileRoute("/_authenticated/os/scheduler")({
   head: () => ({
     meta: [
       { title: "Scheduler — Cloud OS" },

@@ -25,7 +25,7 @@ import {
 import { activity, virtualMachines } from "@/features/cloud/data";
 import { VMCard } from "@/components/cloud/vm-card";
 
-export const Route = createFileRoute("/os/")({
+export const Route = createFileRoute("/_authenticated/os/")({
   head: () => ({
     meta: [
       { title: "Dashboard — Cloud OS" },

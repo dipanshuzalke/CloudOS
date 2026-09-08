@@ -12,7 +12,7 @@ import { GlassSkeletonGrid, BackendErrorState, EmptyState } from "@/components/c
 import { CreateVMDialog } from "@/components/cloud/create-vm";
 import { Plus } from "lucide-react";
 
-export const Route = createFileRoute("/os/vms")({
+export const Route = createFileRoute("/_authenticated/os/vms")({
   head: () => ({
     meta: [
       {

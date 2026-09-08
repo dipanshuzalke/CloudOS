@@ -10,89 +10,117 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as OsRouteImport } from './routes/os'
-import { Route as OsIndexRouteImport } from './routes/os.index'
-import { Route as OsAnalyticsRouteImport } from './routes/os.analytics'
-import { Route as OsSchedulerRouteImport } from './routes/os.scheduler'
-import { Route as OsSettingsRouteImport } from './routes/os.settings'
-import { Route as OsTasksRouteImport } from './routes/os.tasks'
-import { Route as OsVmsRouteImport } from './routes/os.vms'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AuthenticatedOsRouteImport } from './routes/_authenticated/os'
+import { Route as AuthenticatedOsIndexRouteImport } from './routes/_authenticated/os.index'
+import { Route as AuthenticatedOsAnalyticsRouteImport } from './routes/_authenticated/os.analytics'
+import { Route as AuthenticatedOsSchedulerRouteImport } from './routes/_authenticated/os.scheduler'
+import { Route as AuthenticatedOsSettingsRouteImport } from './routes/_authenticated/os.settings'
+import { Route as AuthenticatedOsTasksRouteImport } from './routes/_authenticated/os.tasks'
+import { Route as AuthenticatedOsVmsRouteImport } from './routes/_authenticated/os.vms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OsRoute = OsRouteImport.update({
-  id: '/os',
-  path: '/os',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OsIndexRoute = OsIndexRouteImport.update({
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedOsRoute = AuthenticatedOsRouteImport.update({
+  id: '/os',
+  path: '/os',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOsIndexRoute = AuthenticatedOsIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => OsRoute,
+  getParentRoute: () => AuthenticatedOsRoute,
 } as any)
-const OsAnalyticsRoute = OsAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => OsRoute,
-} as any)
-const OsSchedulerRoute = OsSchedulerRouteImport.update({
-  id: '/scheduler',
-  path: '/scheduler',
-  getParentRoute: () => OsRoute,
-} as any)
-const OsSettingsRoute = OsSettingsRouteImport.update({
+const AuthenticatedOsAnalyticsRoute =
+  AuthenticatedOsAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedOsRoute,
+  } as any)
+const AuthenticatedOsSchedulerRoute =
+  AuthenticatedOsSchedulerRouteImport.update({
+    id: '/scheduler',
+    path: '/scheduler',
+    getParentRoute: () => AuthenticatedOsRoute,
+  } as any)
+const AuthenticatedOsSettingsRoute = AuthenticatedOsSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => OsRoute,
+  getParentRoute: () => AuthenticatedOsRoute,
 } as any)
-const OsTasksRoute = OsTasksRouteImport.update({
+const AuthenticatedOsTasksRoute = AuthenticatedOsTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
-  getParentRoute: () => OsRoute,
+  getParentRoute: () => AuthenticatedOsRoute,
 } as any)
-const OsVmsRoute = OsVmsRouteImport.update({
+const AuthenticatedOsVmsRoute = AuthenticatedOsVmsRouteImport.update({
   id: '/vms',
   path: '/vms',
-  getParentRoute: () => OsRoute,
+  getParentRoute: () => AuthenticatedOsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/os': typeof OsRouteWithChildren
-  '/os/analytics': typeof OsAnalyticsRoute
-  '/os/scheduler': typeof OsSchedulerRoute
-  '/os/settings': typeof OsSettingsRoute
-  '/os/tasks': typeof OsTasksRoute
-  '/os/vms': typeof OsVmsRoute
-  '/os/': typeof OsIndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/os': typeof AuthenticatedOsRouteWithChildren
+  '/os/analytics': typeof AuthenticatedOsAnalyticsRoute
+  '/os/scheduler': typeof AuthenticatedOsSchedulerRoute
+  '/os/settings': typeof AuthenticatedOsSettingsRoute
+  '/os/tasks': typeof AuthenticatedOsTasksRoute
+  '/os/vms': typeof AuthenticatedOsVmsRoute
+  '/os/': typeof AuthenticatedOsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/os/analytics': typeof OsAnalyticsRoute
-  '/os/scheduler': typeof OsSchedulerRoute
-  '/os/settings': typeof OsSettingsRoute
-  '/os/tasks': typeof OsTasksRoute
-  '/os/vms': typeof OsVmsRoute
-  '/os': typeof OsIndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/os/analytics': typeof AuthenticatedOsAnalyticsRoute
+  '/os/scheduler': typeof AuthenticatedOsSchedulerRoute
+  '/os/settings': typeof AuthenticatedOsSettingsRoute
+  '/os/tasks': typeof AuthenticatedOsTasksRoute
+  '/os/vms': typeof AuthenticatedOsVmsRoute
+  '/os': typeof AuthenticatedOsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/os': typeof OsRouteWithChildren
-  '/os/analytics': typeof OsAnalyticsRoute
-  '/os/scheduler': typeof OsSchedulerRoute
-  '/os/settings': typeof OsSettingsRoute
-  '/os/tasks': typeof OsTasksRoute
-  '/os/vms': typeof OsVmsRoute
-  '/os/': typeof OsIndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/_authenticated/os': typeof AuthenticatedOsRouteWithChildren
+  '/_authenticated/os/analytics': typeof AuthenticatedOsAnalyticsRoute
+  '/_authenticated/os/scheduler': typeof AuthenticatedOsSchedulerRoute
+  '/_authenticated/os/settings': typeof AuthenticatedOsSettingsRoute
+  '/_authenticated/os/tasks': typeof AuthenticatedOsTasksRoute
+  '/_authenticated/os/vms': typeof AuthenticatedOsVmsRoute
+  '/_authenticated/os/': typeof AuthenticatedOsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
+    | '/register'
     | '/os'
     | '/os/analytics'
     | '/os/scheduler'
@@ -103,6 +131,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
+    | '/register'
     | '/os/analytics'
     | '/os/scheduler'
     | '/os/settings'
@@ -112,18 +142,23 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/os'
-    | '/os/analytics'
-    | '/os/scheduler'
-    | '/os/settings'
-    | '/os/tasks'
-    | '/os/vms'
-    | '/os/'
+    | '/_authenticated'
+    | '/login'
+    | '/register'
+    | '/_authenticated/os'
+    | '/_authenticated/os/analytics'
+    | '/_authenticated/os/scheduler'
+    | '/_authenticated/os/settings'
+    | '/_authenticated/os/tasks'
+    | '/_authenticated/os/vms'
+    | '/_authenticated/os/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  OsRoute: typeof OsRouteWithChildren
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,81 +170,118 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/os': {
-      id: '/os'
-      path: '/os'
-      fullPath: '/os'
-      preLoaderRoute: typeof OsRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/os/': {
-      id: '/os/'
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/os': {
+      id: '/_authenticated/os'
+      path: '/os'
+      fullPath: '/os'
+      preLoaderRoute: typeof AuthenticatedOsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/os/': {
+      id: '/_authenticated/os/'
       path: '/'
       fullPath: '/os/'
-      preLoaderRoute: typeof OsIndexRouteImport
-      parentRoute: typeof OsRoute
+      preLoaderRoute: typeof AuthenticatedOsIndexRouteImport
+      parentRoute: typeof AuthenticatedOsRoute
     }
-    '/os/analytics': {
-      id: '/os/analytics'
+    '/_authenticated/os/analytics': {
+      id: '/_authenticated/os/analytics'
       path: '/analytics'
       fullPath: '/os/analytics'
-      preLoaderRoute: typeof OsAnalyticsRouteImport
-      parentRoute: typeof OsRoute
+      preLoaderRoute: typeof AuthenticatedOsAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedOsRoute
     }
-    '/os/scheduler': {
-      id: '/os/scheduler'
+    '/_authenticated/os/scheduler': {
+      id: '/_authenticated/os/scheduler'
       path: '/scheduler'
       fullPath: '/os/scheduler'
-      preLoaderRoute: typeof OsSchedulerRouteImport
-      parentRoute: typeof OsRoute
+      preLoaderRoute: typeof AuthenticatedOsSchedulerRouteImport
+      parentRoute: typeof AuthenticatedOsRoute
     }
-    '/os/settings': {
-      id: '/os/settings'
+    '/_authenticated/os/settings': {
+      id: '/_authenticated/os/settings'
       path: '/settings'
       fullPath: '/os/settings'
-      preLoaderRoute: typeof OsSettingsRouteImport
-      parentRoute: typeof OsRoute
+      preLoaderRoute: typeof AuthenticatedOsSettingsRouteImport
+      parentRoute: typeof AuthenticatedOsRoute
     }
-    '/os/tasks': {
-      id: '/os/tasks'
+    '/_authenticated/os/tasks': {
+      id: '/_authenticated/os/tasks'
       path: '/tasks'
       fullPath: '/os/tasks'
-      preLoaderRoute: typeof OsTasksRouteImport
-      parentRoute: typeof OsRoute
+      preLoaderRoute: typeof AuthenticatedOsTasksRouteImport
+      parentRoute: typeof AuthenticatedOsRoute
     }
-    '/os/vms': {
-      id: '/os/vms'
+    '/_authenticated/os/vms': {
+      id: '/_authenticated/os/vms'
       path: '/vms'
       fullPath: '/os/vms'
-      preLoaderRoute: typeof OsVmsRouteImport
-      parentRoute: typeof OsRoute
+      preLoaderRoute: typeof AuthenticatedOsVmsRouteImport
+      parentRoute: typeof AuthenticatedOsRoute
     }
   }
 }
 
-interface OsRouteChildren {
-  OsAnalyticsRoute: typeof OsAnalyticsRoute
-  OsSchedulerRoute: typeof OsSchedulerRoute
-  OsSettingsRoute: typeof OsSettingsRoute
-  OsTasksRoute: typeof OsTasksRoute
-  OsVmsRoute: typeof OsVmsRoute
-  OsIndexRoute: typeof OsIndexRoute
+interface AuthenticatedOsRouteChildren {
+  AuthenticatedOsAnalyticsRoute: typeof AuthenticatedOsAnalyticsRoute
+  AuthenticatedOsSchedulerRoute: typeof AuthenticatedOsSchedulerRoute
+  AuthenticatedOsSettingsRoute: typeof AuthenticatedOsSettingsRoute
+  AuthenticatedOsTasksRoute: typeof AuthenticatedOsTasksRoute
+  AuthenticatedOsVmsRoute: typeof AuthenticatedOsVmsRoute
+  AuthenticatedOsIndexRoute: typeof AuthenticatedOsIndexRoute
 }
 
-const OsRouteChildren: OsRouteChildren = {
-  OsAnalyticsRoute: OsAnalyticsRoute,
-  OsSchedulerRoute: OsSchedulerRoute,
-  OsSettingsRoute: OsSettingsRoute,
-  OsTasksRoute: OsTasksRoute,
-  OsVmsRoute: OsVmsRoute,
-  OsIndexRoute: OsIndexRoute,
+const AuthenticatedOsRouteChildren: AuthenticatedOsRouteChildren = {
+  AuthenticatedOsAnalyticsRoute: AuthenticatedOsAnalyticsRoute,
+  AuthenticatedOsSchedulerRoute: AuthenticatedOsSchedulerRoute,
+  AuthenticatedOsSettingsRoute: AuthenticatedOsSettingsRoute,
+  AuthenticatedOsTasksRoute: AuthenticatedOsTasksRoute,
+  AuthenticatedOsVmsRoute: AuthenticatedOsVmsRoute,
+  AuthenticatedOsIndexRoute: AuthenticatedOsIndexRoute,
 }
 
-const OsRouteWithChildren = OsRoute._addFileChildren(OsRouteChildren)
+const AuthenticatedOsRouteWithChildren = AuthenticatedOsRoute._addFileChildren(
+  AuthenticatedOsRouteChildren,
+)
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedOsRoute: typeof AuthenticatedOsRouteWithChildren
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedOsRoute: AuthenticatedOsRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  OsRoute: OsRouteWithChildren,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

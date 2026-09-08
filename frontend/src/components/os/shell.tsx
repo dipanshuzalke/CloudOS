@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import {
@@ -8,6 +8,7 @@ import {
   Gauge,
   LayoutDashboard,
   ListChecks,
+  LogOut,
   Moon,
   Search,
   Server,
@@ -15,6 +16,7 @@ import {
   Sun,
   Timer,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const nav = [
   { to: "/os", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -29,9 +31,7 @@ function useClock() {
   const [now, setNow] = useState<string>("");
   useEffect(() => {
     const tick = () =>
-      setNow(
-        new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      );
+      setNow(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
     tick();
     const id = setInterval(tick, 1000 * 20);
     return () => clearInterval(id);
@@ -40,6 +40,10 @@ function useClock() {
 }
 
 export function Sidebar() {
+  const { user } = useAuth();
+
+  const initials = (user?.username || "U").slice(0, 1).toUpperCase();
+
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [dark, setDark] = useState(false);
 
@@ -95,11 +99,13 @@ export function Sidebar() {
         </button>
         <div className="flex items-center gap-3 rounded-2xl border border-glass-border px-3.5 py-3">
           <span className="flex size-8 items-center justify-center rounded-full bg-primary-soft text-[12px] font-semibold text-primary">
-            AR
+            {initials}
           </span>
-          <div className="leading-tight">
-            <div className="text-[13px] font-medium">Ada Reyes</div>
-            <div className="text-[12px] text-muted-foreground">Infrastructure lead</div>
+
+          <div className="min-w-0 leading-tight">
+            <div className="truncate text-[13px] font-medium">{user?.username || "User"}</div>
+
+            <div className="truncate text-[12px] text-muted-foreground">{user?.email}</div>
           </div>
         </div>
       </div>
@@ -108,6 +114,19 @@ export function Sidebar() {
 }
 
 export function Topbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const username = user?.username || "User";
+
+  const initials = username.slice(0, 1).toUpperCase();
+
+  const handleLogout = () => {
+    logout();
+    navigate({ to: "/login" });
+  };
   const clock = useClock();
   return (
     <motion.header
@@ -126,14 +145,61 @@ export function Topbar() {
           <Command className="size-3" />K
         </span>
       </div>
-      <span className="hidden text-[13px] tabular-nums text-muted-foreground sm:block">{clock}</span>
+      <span className="hidden text-[13px] tabular-nums text-muted-foreground sm:block">
+        {clock}
+      </span>
       <button className="relative rounded-xl p-2.5 transition-colors hover:bg-muted">
         <Bell className="size-4.5 text-muted-foreground" />
         <span className="absolute top-2 right-2 size-1.5 rounded-full bg-primary" />
       </button>
-      <span className="flex size-9 items-center justify-center rounded-full bg-foreground text-[12px] font-semibold text-background">
-        AR
-      </span>
+      <button
+        type="button"
+        onClick={() => setProfileOpen((open) => !open)}
+        className="flex size-9 items-center justify-center rounded-full bg-foreground text-[12px] font-semibold text-background transition-transform hover:scale-105"
+      >
+        {initials}
+      </button>
+      {profileOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -8, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-glass-border bg-background p-2 shadow-xl"
+        >
+          <div className="px-3 py-3">
+            <div className="flex items-center gap-3">
+              <span className="flex size-10 items-center justify-center rounded-full bg-foreground text-[12px] font-semibold text-background">
+                {initials}
+              </span>
+
+              <div className="min-w-0">
+                <div className="truncate text-[14px] font-semibold">{user?.username}</div>
+
+                <div className="truncate text-[12px] text-muted-foreground">{user?.email}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="my-1 border-t border-glass-border" />
+
+          <Link
+            to="/os/settings"
+            onClick={() => setProfileOpen(false)}
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <Settings className="size-4" />
+            Settings
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <LogOut className="size-4" />
+            Logout
+          </button>
+        </motion.div>
+      )}
     </motion.header>
   );
 }

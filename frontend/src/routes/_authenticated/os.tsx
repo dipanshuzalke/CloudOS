@@ -2,7 +2,7 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { MobileNav, Sidebar, Topbar } from "@/components/os/shell";
 
-export const Route = createFileRoute("/os")({
+export const Route = createFileRoute("/_authenticated/os")({
   head: () => ({
     meta: [
       { title: "Cloud OS — Infrastructure Control" },

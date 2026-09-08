@@ -9,7 +9,7 @@ import {
   WeeklyBarChart,
 } from "@/components/cloud/charts";
 
-export const Route = createFileRoute("/os/analytics")({
+export const Route = createFileRoute("/_authenticated/os/analytics")({
   head: () => ({
     meta: [
       { title: "Analytics — Cloud OS" },

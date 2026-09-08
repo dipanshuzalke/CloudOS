@@ -4,7 +4,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 
-export const Route = createFileRoute("/os/settings")({
+export const Route = createFileRoute("/_authenticated/os/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Cloud OS" },
