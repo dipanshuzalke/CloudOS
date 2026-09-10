@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.vm import VM
+from app.models.user import User
 from app.schemas.vm import VMCreate, VMResponse
+
+from app.core.dependencies import get_current_user
 
 from app.services.docker_service import (
     create_vm_container,
@@ -42,7 +45,8 @@ router = APIRouter(
 @router.post("", response_model=VMResponse, status_code=201)
 def create_vm(
     vm_data: VMCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     if vm_data.os not in OS_IMAGES:
         raise HTTPException(
@@ -75,6 +79,7 @@ def create_vm(
         uptime = get_container_uptime(container)
 
         vm = VM(
+            user_id=current_user.id,
             name=vm_data.name,
             os=vm_data.os,
             region=vm_data.region,
@@ -119,24 +124,26 @@ def create_vm(
 
 @router.get(
     "",
-    response_model=list[VMResponse]
+    response_model=list[VMResponse],
 )
 def get_vms(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-
-    vms = db.query(VM).all()
+    vms = (
+        db.query(VM)
+        .filter(VM.user_id == current_user.id)
+        .all()
+    )
 
     result = []
 
     for vm in vms:
-
         status = vm.status
         ip = None
         uptime = None
 
         if vm.container_id:
-
             try:
                 container = client.containers.get(
                     vm.container_id
@@ -160,7 +167,8 @@ def get_vms(
                 else:
                     status = "stopped"
 
-            except Exception:
+            except Exception as e:
+                print(f"Failed to get Docker container {vm.container_id}: {e}")
                 status = "failed"
 
         result.append({
@@ -184,9 +192,10 @@ def get_vms(
 @router.delete("/{vm_id}")
 def delete_vm(
     vm_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    vm = db.query(VM).filter(VM.id == vm_id).first()
+    vm = db.query(VM).filter(VM.id == vm_id, VM.user_id == current_user.id,).first()
 
     if not vm:
         raise HTTPException(
@@ -205,8 +214,9 @@ def delete_vm(
 def start_vm(
     vm_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    vm = db.query(VM).filter(VM.id == vm_id).first()
+    vm = db.query(VM).filter(VM.id == vm_id, VM.user_id == current_user.id,).first()
 
     if not vm:
         raise HTTPException(
@@ -242,8 +252,9 @@ def start_vm(
 def stop_vm(
     vm_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    vm = db.query(VM).filter(VM.id == vm_id).first()
+    vm = db.query(VM).filter(VM.id == vm_id, VM.user_id == current_user.id,).first()
 
     if not vm:
         raise HTTPException(
@@ -279,8 +290,9 @@ def stop_vm(
 def restart_vm(
     vm_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    vm = db.query(VM).filter(VM.id == vm_id).first()
+    vm = db.query(VM).filter(VM.id == vm_id, VM.user_id == current_user.id,).first()
 
     if not vm:
         raise HTTPException(
