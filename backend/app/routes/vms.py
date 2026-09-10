@@ -10,6 +10,11 @@ from app.schemas.vm import VMCreate, VMResponse
 
 from app.core.dependencies import get_current_user
 
+from app.services.scheduler import schedule
+from app.services.resource_manager import allocate_resources, release_resources
+
+from app.services.scheduler_config import get_scheduler_algorithm
+
 from app.services.docker_service import (
     create_vm_container,
     start_vm_container,
@@ -62,7 +67,38 @@ def create_vm(
 
     container = None
 
-    try:
+    try: 
+        # ---------------------------------
+        # 1. Scheduler selects a compute node
+        # ---------------------------------
+        selected_node = schedule(
+            db=db,
+            algorithm=get_scheduler_algorithm(),
+            cpu=vm_data.cpu,
+            ram=vm_data.ram,
+            storage=vm_data.storage,
+        )
+
+        if not selected_node:
+            raise HTTPException(
+                status_code=409,
+                detail="Insufficient resources available",
+            )
+
+        # ---------------------------------
+        # 2. Resource Manager reserves resources
+        # ---------------------------------
+        allocate_resources(
+            db=db,
+            node_id=selected_node.id,
+            cpu=vm_data.cpu,
+            ram=vm_data.ram,
+            storage=vm_data.storage,
+        )
+
+        # ---------------------------------
+        # 3. Create Docker container
+        # ---------------------------------
         container_name = f"cloudos-vm-{uuid.uuid4().hex[:6]}"
 
         container = create_vm_container(
@@ -78,8 +114,12 @@ def create_vm(
 
         uptime = get_container_uptime(container)
 
+        # ---------------------------------
+        # 4. Save VM in database
+        # ---------------------------------
         vm = VM(
             user_id=current_user.id,
+            node_id=selected_node.id,   
             name=vm_data.name,
             os=vm_data.os,
             region=vm_data.region,
@@ -91,6 +131,10 @@ def create_vm(
         )
 
         db.add(vm)
+
+         # ---------------------------------
+        # 5. Commit everything together
+        # ---------------------------------
         db.commit()
         db.refresh(vm)
 
@@ -103,11 +147,22 @@ def create_vm(
             "storage": vm.storage,
             "os": vm.os,
             "region": vm.region,
+            "node_id": vm.node_id,
             "ip": ip,
             "uptime": uptime,
             "container_id": vm.container_id,
             "created_at": vm.created_at,
         }
+
+    except HTTPException:
+        if container:
+            try:
+                container.remove(force=True)
+            except Exception:
+                pass
+
+        db.rollback()
+        raise
 
     except Exception as error:
         if container:
@@ -195,6 +250,9 @@ def delete_vm(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # ---------------------------------
+    # 1. Find VM belonging to current user
+    # ---------------------------------
     vm = db.query(VM).filter(VM.id == vm_id, VM.user_id == current_user.id,).first()
 
     if not vm:
@@ -203,12 +261,53 @@ def delete_vm(
             detail="VM not found"
         )
 
-    db.delete(vm)
-    db.commit()
+    try:
+        # ---------------------------------
+        # 2. Remove Docker container
+        # ---------------------------------
+        if vm.container_id:
+            try:
+                container = client.containers.get(vm.container_id)
+                container.remove(force=True)
+            except Exception as error:
+                print(
+                    f"Failed to remove Docker container "
+                    f"{vm.container_id}: {error}"
+                )
 
-    return {
-        "message": "VM deleted successfully"
-    }
+        # ---------------------------------
+        # 3. Release allocated resources
+        # ---------------------------------
+        if vm.node_id is not None:
+            release_resources(
+                db=db,
+                node_id=vm.node_id,
+                cpu=vm.cpu,
+                ram=vm.ram,
+                storage=vm.storage,
+            )
+
+        # ---------------------------------
+        # 4. Delete VM database record
+        # ---------------------------------
+        db.delete(vm)
+
+         # ---------------------------------
+        # 5. Commit
+        # ---------------------------------
+        db.commit()
+
+        return {
+            "message": "VM deleted successfully"
+        }
+
+    except Exception as error:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(error),
+        )
 
 @router.post("/{vm_id}/start", response_model=VMResponse)
 def start_vm(

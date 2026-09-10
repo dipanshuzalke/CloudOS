@@ -84,7 +84,7 @@ export interface Algorithm {
 
 export const algorithms: Algorithm[] = [
   {
-    id: "round-robin",
+    id: "round_robin",
     name: "Round Robin",
     tagline: "Equal turns, predictable rhythm",
     description:
@@ -97,7 +97,7 @@ export const algorithms: Algorithm[] = [
     utilization: 64,
   },
   {
-    id: "least-loaded",
+    id: "least_loaded",
     name: "Least Loaded",
     tagline: "Always feed the quietest node",
     description:
@@ -110,7 +110,7 @@ export const algorithms: Algorithm[] = [
     utilization: 93,
   },
   {
-    id: "best-fit",
+    id: "best_fit",
     name: "Best Fit",
     tagline: "The tightest possible packing",
     description:
@@ -123,7 +123,7 @@ export const algorithms: Algorithm[] = [
     utilization: 88,
   },
   {
-    id: "first-fit",
+    id: "first_fit",
     name: "First Fit",
     tagline: "The fastest good-enough answer",
     description:

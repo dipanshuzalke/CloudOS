@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { useState, type FormEvent } from "react";
 
+import { useAuth } from "@/context/AuthContext";
 import { registerUser } from "@/lib/api";
 
 export const Route = createFileRoute("/register")({
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/register")({
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const { setSession } = useAuth();
 
   const [username, setUsername] = useState("");
 
@@ -47,9 +49,7 @@ function RegisterPage() {
         password,
       });
 
-      localStorage.setItem("cloudos_token", result.access_token);
-
-      localStorage.setItem("cloudos_user", JSON.stringify(result.user));
+      setSession(result.access_token, result.user);
 
       await navigate({
         to: "/os",

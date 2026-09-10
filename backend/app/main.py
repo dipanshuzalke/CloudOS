@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, engine
 from app.models import VM, Task, User
-from app.routes import vms, tasks, auth
+from app.routes import vms, tasks, auth, nodes, scheduler
 
 
 Base.metadata.create_all(bind=engine)
@@ -29,6 +29,8 @@ app.add_middleware(
 app.include_router(vms.router)
 app.include_router(tasks.router)
 app.include_router(auth.router)
+app.include_router(nodes.router)
+app.include_router(scheduler.router)
 
 
 @app.get("/")

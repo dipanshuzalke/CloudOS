@@ -19,29 +19,19 @@ class VMCreate(BaseModel):
 
 class VMResponse(BaseModel):
     id: int
-
     name: str
-
     status: str
-
     cpu: int
-
     ram: int
-
     storage: int
-
     os: str
-
     region: str
 
+    node_id: int | None = None
+
     ip: str | None = None
-
     uptime: str | None = None
-
     container_id: str | None = None
-
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    model_config = ConfigDict(from_attributes=True)

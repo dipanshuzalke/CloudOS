@@ -88,6 +88,61 @@ export interface CreateTaskRequest {
   ram_required: number;
 }
 
+
+/* =========================================================
+   SCHEDULER API
+========================================================= */
+
+export interface SchedulerResponse {
+  algorithm: string;
+  available_algorithms: string[];
+}
+
+export interface SchedulerUpdateRequest {
+  algorithm: string;
+}
+
+export interface ComputeNodeFromAPI {
+  id: number;
+  name: string;
+
+  total_cpu: number;
+  allocated_cpu: number;
+  available_cpu: number;
+
+  total_ram: number;
+  allocated_ram: number;
+  available_ram: number;
+
+  total_storage: number;
+  allocated_storage: number;
+  available_storage: number;
+
+  status: string;
+  created_at: string;
+}
+
+export async function getScheduler(): Promise<SchedulerResponse> {
+  const response = await apiFetch("/api/scheduler");
+  return (await response.json()) as SchedulerResponse;
+}
+
+export async function updateScheduler(
+  data: SchedulerUpdateRequest,
+): Promise<SchedulerResponse> {
+  const response = await apiFetch("/api/scheduler", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+
+  return (await response.json()) as SchedulerResponse;
+}
+
+export async function getComputeNodes(): Promise<ComputeNodeFromAPI[]> {
+  const response = await apiFetch("/api/nodes");
+  return (await response.json()) as ComputeNodeFromAPI[];
+}
+
 /* =========================================================
    API FETCH HELPER
 ========================================================= */

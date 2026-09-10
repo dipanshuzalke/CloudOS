@@ -15,6 +15,13 @@ class VM(Base):
         index=True,
     )
 
+    node_id = Column(
+        Integer,
+        ForeignKey("compute_nodes.id"),
+        nullable=True,
+        index=True,
+    )
+
     name = Column(String(100), nullable=False)
 
     os = Column(String(50), nullable=False)

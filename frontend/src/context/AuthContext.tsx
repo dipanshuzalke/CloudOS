@@ -21,6 +21,7 @@ interface AuthContextType {
   isLoading: boolean;
 
   login: (data: LoginRequest) => Promise<void>;
+  setSession: (token: string, user: UserFromAPI) => void;
   logout: () => void;
 }
 
@@ -78,21 +79,27 @@ export function AuthProvider({
   ) => {
     const result = await loginUser(data);
 
-    localStorage.setItem(
-      "cloudos_token",
-      result.access_token
-    );
+    // getCurrentUser authenticates through apiFetch, which reads this token.
+    localStorage.setItem("cloudos_token", result.access_token);
 
-    setToken(result.access_token);
+    try {
+      const currentUser = await getCurrentUser();
+      setSession(result.access_token, currentUser);
+    } catch (error) {
+      localStorage.removeItem("cloudos_token");
+      throw error;
+    }
+  };
 
-    const currentUser =
-      await getCurrentUser();
+  const setSession = (sessionToken: string, currentUser: UserFromAPI) => {
+    localStorage.setItem("cloudos_token", sessionToken);
 
     localStorage.setItem(
       "cloudos_user",
       JSON.stringify(currentUser)
     );
 
+    setToken(sessionToken);
     setUser(currentUser);
   };
 
@@ -111,6 +118,7 @@ export function AuthProvider({
         isAuthenticated: !!token,
         isLoading,
         login,
+        setSession,
         logout,
       }}
     >
