@@ -73,7 +73,7 @@ def create_vm(
         # ---------------------------------
         selected_node = schedule(
             db=db,
-            algorithm=get_scheduler_algorithm(),
+            algorithm=get_scheduler_algorithm(db),
             cpu=vm_data.cpu,
             ram=vm_data.ram,
             storage=vm_data.storage,
