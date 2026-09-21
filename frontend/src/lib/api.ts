@@ -78,7 +78,9 @@ export interface TaskFromAPI {
   name: string;
   cpu_required: number;
   ram_required: number;
+  storage_required: number;
   status: string;
+  node_id: number | null;
   created_at: string;
 }
 
@@ -86,6 +88,7 @@ export interface CreateTaskRequest {
   name: string;
   cpu_required: number;
   ram_required: number;
+  storage_required: number;
 }
 
 
@@ -406,6 +409,54 @@ export async function deleteTask(
     `/api/tasks/${taskId}`,
     {
       method: "DELETE",
+    }
+  );
+
+  return response.json();
+}
+
+/**
+ * Start Task
+ */
+export async function startTask(
+  taskId: number
+): Promise<TaskFromAPI> {
+  const response = await apiFetch(
+    `/api/tasks/${taskId}/start`,
+    {
+      method: "POST",
+    }
+  );
+
+  return response.json();
+}
+
+/**
+ * Check Docker-backed task status
+ */
+export async function getTaskStatus(
+  taskId: number
+): Promise<TaskFromAPI> {
+  const response = await apiFetch(
+    `/api/tasks/${taskId}/status`,
+    {
+      method: "GET",
+    }
+  );
+
+  return response.json();
+}
+
+/**
+ * Complete Task
+ */
+export async function completeTask(
+  taskId: number
+): Promise<TaskFromAPI> {
+  const response = await apiFetch(
+    `/api/tasks/${taskId}/complete`,
+    {
+      method: "POST",
     }
   );
 

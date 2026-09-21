@@ -163,3 +163,177 @@ def restart_vm_container(container_id: str):
         raise RuntimeError(
             f"Failed to restart container: {error}"
         )
+
+def run_task_container(
+    container_name: str,
+    cpu: int,
+    ram_mb: int,
+    command: str,
+):
+    try:
+        container = client.containers.run(
+            image="alpine:3.20",
+            name=container_name,
+            command=["sh", "-c", command],
+            detach=True,
+            nano_cpus=cpu * 1_000_000_000,
+            mem_limit=f"{ram_mb}m",
+        )
+
+        return container
+
+    except DockerException as error:
+        raise RuntimeError(
+            f"Failed to run task container: {error}"
+        )
+
+def get_task_container_status(container_id: str):
+    try:
+        container = client.containers.get(container_id)
+        container.reload()
+
+        status = container.status
+
+        if status == "exited":
+            result = container.wait()
+            exit_code = result.get("StatusCode", 1)
+
+            return {
+                "status": "completed" if exit_code == 0 else "failed",
+                "exit_code": exit_code,
+            }
+
+        return {
+            "status": "running",
+            "exit_code": None,
+        }
+
+    except NotFound:
+        raise RuntimeError("Task container not found")
+
+    except DockerException as error:
+        raise RuntimeError(
+            f"Failed to check task container: {error}"
+        )
+
+def delete_task_container(container_id: str):
+    try:
+        container = client.containers.get(container_id)
+
+        if container.status == "running":
+            container.stop(timeout=10)
+
+        container.remove()
+
+    except NotFound:
+        # Container is already gone
+        pass
+
+    except DockerException as error:
+        raise RuntimeError(
+            f"Failed to delete task container: {error}"
+        )
+
+def get_container_stats(container):
+    """
+    Get real-time CPU, memory and network statistics
+    from a running Docker container.
+    """
+
+    try:
+        container.reload()
+
+        stats = container.stats(stream=False)
+
+        # -----------------------------
+        # CPU Usage
+        # -----------------------------
+        cpu_stats = stats.get("cpu_stats", {})
+        precpu_stats = stats.get("precpu_stats", {})
+
+        cpu_delta = (
+            cpu_stats.get("cpu_usage", {}).get("total_usage", 0)
+            - precpu_stats.get("cpu_usage", {}).get("total_usage", 0)
+        )
+
+        system_delta = (
+            cpu_stats.get("system_cpu_usage", 0)
+            - precpu_stats.get("system_cpu_usage", 0)
+        )
+
+        online_cpus = cpu_stats.get("online_cpus")
+
+        if not online_cpus:
+            percpu_usage = (
+                cpu_stats.get("cpu_usage", {})
+                .get("percpu_usage", [])
+            )
+
+            online_cpus = len(percpu_usage) or 1
+
+        if system_delta > 0 and cpu_delta > 0:
+            cpu_percent = (
+                (cpu_delta / system_delta)
+                * online_cpus
+                * 100.0
+            )
+        else:
+            cpu_percent = 0.0
+
+        # -----------------------------
+        # Memory Usage
+        # -----------------------------
+        memory_stats = stats.get("memory_stats", {})
+
+        memory_usage = memory_stats.get("usage", 0)
+        memory_limit = memory_stats.get("limit", 0)
+
+        if memory_limit > 0:
+            memory_percent = (
+                memory_usage / memory_limit
+            ) * 100.0
+        else:
+            memory_percent = 0.0
+
+        # -----------------------------
+        # Network Usage
+        # -----------------------------
+        networks = stats.get("networks", {})
+
+        network_rx_bytes = 0
+        network_tx_bytes = 0
+
+        for network in networks.values():
+            network_rx_bytes += network.get(
+                "rx_bytes",
+                0
+            )
+
+            network_tx_bytes += network.get(
+                "tx_bytes",
+                0
+            )
+
+        return {
+            "cpu_percent": round(cpu_percent, 2),
+
+            "memory_usage": memory_usage,
+            "memory_limit": memory_limit,
+            "memory_percent": round(
+                memory_percent,
+                2
+            ),
+
+            "network_rx_bytes": network_rx_bytes,
+            "network_tx_bytes": network_tx_bytes,
+        }
+
+    except NotFound:
+        raise RuntimeError(
+            "Docker container not found"
+        )
+
+    except DockerException as error:
+        raise RuntimeError(
+            f"Failed to get container stats: {error}"
+        )

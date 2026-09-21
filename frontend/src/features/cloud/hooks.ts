@@ -8,6 +8,9 @@ import {
   createTask,
   createVM,
   deleteTask,
+  startTask,
+  getTaskStatus,
+  completeTask,
   startVM,
   stopVM,
   restartVM,
@@ -154,6 +157,75 @@ export function useDeleteTask() {
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
       });
+    },
+  });
+}
+
+/* =========================================================
+   START TASK
+========================================================= */
+
+export function useStartTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => startTask(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tasks"],
+      });
+    },
+  });
+}
+
+/* =========================================================
+   COMPLETE TASK
+========================================================= */
+
+export function useCompleteTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => completeTask(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tasks"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["compute-nodes"],
+      });
+    },
+  });
+}
+
+/* =========================================================
+   TASK STATUS POLLING
+========================================================= */
+
+export function useTaskStatus(
+  taskId: number,
+  enabled: boolean,
+) {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: ["task-status", taskId],
+    queryFn: () => getTaskStatus(taskId),
+    enabled,
+    refetchInterval: enabled ? 2000 : false,
+
+    onSuccess: (task: any) => {
+      if (
+        task.status === "completed" ||
+        task.status === "failed"
+      ) {
+        queryClient.invalidateQueries({
+          queryKey: ["tasks"],
+        });
+      }
     },
   });
 }

@@ -13,7 +13,15 @@ class Task(Base):
         Integer,
         ForeignKey("users.id"),
         nullable=False,
-        )
+        index=True,
+    )
+
+    node_id = Column(
+        Integer,
+        ForeignKey("compute_nodes.id"),
+        nullable=True,
+        index=True,
+    )
 
     name = Column(String(100), nullable=False)
 
@@ -21,9 +29,23 @@ class Task(Base):
 
     ram_required = Column(Integer, nullable=False)
 
-    status = Column(String(30), nullable=False, default="queued")
+    storage_required = Column(Integer, nullable=False)
+
+    command = Column(
+        String(500),
+        nullable=False,
+        default="echo CloudOS task executed successfully",
+    )
+
+    container_id = Column(String(100), nullable=True, unique=True)
+
+    status = Column(
+        String(30),
+        nullable=False,
+        default="queued",
+    )
 
     created_at = Column(
         DateTime(timezone=True),
-        server_default=func.now()
+        server_default=func.now(),
     )

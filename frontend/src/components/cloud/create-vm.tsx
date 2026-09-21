@@ -33,12 +33,7 @@ const operatingSystems = [
   },
 ];
 
-const regions = [
-  "us-east-1",
-  "us-west-2",
-  "eu-west-1",
-  "ap-south-1",
-];
+const regions = ["us-east-1", "us-west-2", "eu-west-1", "ap-south-1"];
 
 function Field({
   label,
@@ -112,9 +107,7 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
 
       <DialogContent className="glass-panel rounded-[26px] sm:max-w-[440px]">
         <DialogHeader>
-          <DialogTitle className="text-[20px]">
-            Create virtual machine
-          </DialogTitle>
+          <DialogTitle className="text-[20px]">Create virtual machine</DialogTitle>
 
           <DialogDescription>
             Configure the operating system, region, and resources for your VM.
@@ -122,7 +115,6 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
         </DialogHeader>
 
         <form onSubmit={submit} className="space-y-4 pt-2">
-
           {/* VM NAME */}
 
           <Field
@@ -137,13 +129,10 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
           {/* OS + REGION */}
 
           <div className="grid grid-cols-2 gap-4">
-
             {/* OPERATING SYSTEM */}
 
             <label className="block space-y-2">
-              <span className="text-[13px] font-medium">
-                Operating System
-              </span>
+              <span className="text-[13px] font-medium">Operating System</span>
 
               <select
                 value={os}
@@ -151,10 +140,7 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
                 className="w-full rounded-2xl border border-glass-border bg-card/60 px-4 py-3 text-[14px] outline-none transition-shadow focus:ring-2 focus:ring-primary/30"
               >
                 {operatingSystems.map((item) => (
-                  <option
-                    key={item.value}
-                    value={item.value}
-                  >
+                  <option key={item.value} value={item.value}>
                     {item.label}
                   </option>
                 ))}
@@ -164,9 +150,7 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
             {/* REGION */}
 
             <label className="block space-y-2">
-              <span className="text-[13px] font-medium">
-                Region
-              </span>
+              <span className="text-[13px] font-medium">Region</span>
 
               <select
                 value={region}
@@ -174,31 +158,24 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
                 className="w-full rounded-2xl border border-glass-border bg-card/60 px-4 py-3 text-[14px] outline-none transition-shadow focus:ring-2 focus:ring-primary/30"
               >
                 {regions.map((item) => (
-                  <option
-                    key={item}
-                    value={item}
-                  >
+                  <option key={item} value={item}>
                     {item}
                   </option>
                 ))}
               </select>
             </label>
-
           </div>
 
           {/* CPU + RAM */}
 
           <div className="grid grid-cols-2 gap-4">
-
             <Field
               label="vCPU"
               type="number"
               min={1}
               max={16}
               value={cpu}
-              onChange={(e) =>
-                setCpu(Number(e.target.value))
-              }
+              onChange={(e) => setCpu(Number(e.target.value))}
             />
 
             <Field
@@ -208,11 +185,8 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
               max={32768}
               step={64}
               value={ram}
-              onChange={(e) =>
-                setRam(Number(e.target.value))
-              }
+              onChange={(e) => setRam(Number(e.target.value))}
             />
-
           </div>
 
           {/* STORAGE */}
@@ -224,34 +198,22 @@ export function CreateVMDialog({ trigger }: { trigger: ReactNode }) {
             max={1024}
             value={storage}
             hint="CPU and memory limits are enforced by Docker when the VM is provisioned."
-            onChange={(e) =>
-              setStorage(Number(e.target.value))
-            }
+            onChange={(e) => setStorage(Number(e.target.value))}
           />
 
           {/* CREATE */}
 
           <DialogFooter className="pt-2">
-
             <button
               type="submit"
-              disabled={
-                create.isPending ||
-                !name.trim()
-              }
+              disabled={create.isPending || !name.trim()}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-[14px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
             >
-
               {create.isPending && <InlineSpinner />}
 
-              {create.isPending
-                ? "Creating…"
-                : "Create VM"}
-
+              {create.isPending ? "Creating…" : "Create VM"}
             </button>
-
           </DialogFooter>
-
         </form>
       </DialogContent>
     </Dialog>
@@ -271,6 +233,8 @@ export function CreateTaskDialog({ trigger }: { trigger: ReactNode }) {
 
   const [ram, setRam] = useState(512);
 
+  const [storage, setStorage] = useState(10);
+
   const create = useCreateTask();
 
   const submit = async (e: React.FormEvent) => {
@@ -285,6 +249,7 @@ export function CreateTaskDialog({ trigger }: { trigger: ReactNode }) {
         name: name.trim(),
         cpu_required: cpu,
         ram_required: ram,
+        storage_required: storage,
       });
 
       setOpen(false);
@@ -333,6 +298,15 @@ export function CreateTaskDialog({ trigger }: { trigger: ReactNode }) {
               onChange={(e) => setRam(Number(e.target.value))}
             />
           </div>
+          <Field
+            label="Storage required (GB)"
+            type="number"
+            min={1}
+            max={1024}
+            value={storage}
+            hint="Storage is reserved on the compute node when the task is created."
+            onChange={(e) => setStorage(Number(e.target.value))}
+          />
 
           <DialogFooter className="pt-2">
             <button
