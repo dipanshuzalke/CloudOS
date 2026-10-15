@@ -34,7 +34,7 @@ class Task(Base):
     command = Column(
         String(500),
         nullable=False,
-        default="echo CloudOS task executed successfully",
+        default="sleep 30",
     )
 
     container_id = Column(String(100), nullable=True, unique=True)

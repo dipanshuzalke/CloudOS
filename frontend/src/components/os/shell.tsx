@@ -13,16 +13,24 @@ import {
   Search,
   Server,
   Settings,
+  SlidersHorizontal,
   Sun,
   Timer,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+
 
 const nav = [
   { to: "/os", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/os/vms", label: "Virtual Machines", icon: Server, exact: false },
   { to: "/os/tasks", label: "Tasks", icon: ListChecks, exact: false },
   { to: "/os/scheduler", label: "Scheduler", icon: Timer, exact: false },
+  {
+    to: "/os/autoscaling",
+    label: "Auto-Scaling",
+    icon: SlidersHorizontal,
+    exact: false,
+  },
   { to: "/os/analytics", label: "Analytics", icon: Gauge, exact: false },
   { to: "/os/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;

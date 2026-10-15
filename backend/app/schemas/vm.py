@@ -34,4 +34,13 @@ class VMResponse(BaseModel):
     container_id: str | None = None
     created_at: datetime
 
+    cpu_percent: float = 0.0
+
+    memory_usage: int = 0
+    memory_limit: int = 0
+    memory_percent: float = 0.0
+
+    network_rx_bytes: int = 0
+    network_tx_bytes: int = 0
+
     model_config = ConfigDict(from_attributes=True)

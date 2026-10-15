@@ -16,6 +16,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedOsRouteImport } from './routes/_authenticated/os'
 import { Route as AuthenticatedOsIndexRouteImport } from './routes/_authenticated/os.index'
 import { Route as AuthenticatedOsAnalyticsRouteImport } from './routes/_authenticated/os.analytics'
+import { Route as AuthenticatedOsAutoscalingRouteImport } from './routes/_authenticated/os.autoscaling'
 import { Route as AuthenticatedOsSchedulerRouteImport } from './routes/_authenticated/os.scheduler'
 import { Route as AuthenticatedOsSettingsRouteImport } from './routes/_authenticated/os.settings'
 import { Route as AuthenticatedOsTasksRouteImport } from './routes/_authenticated/os.tasks'
@@ -56,6 +57,12 @@ const AuthenticatedOsAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedOsRoute,
   } as any)
+const AuthenticatedOsAutoscalingRoute =
+  AuthenticatedOsAutoscalingRouteImport.update({
+    id: '/autoscaling',
+    path: '/autoscaling',
+    getParentRoute: () => AuthenticatedOsRoute,
+  } as any)
 const AuthenticatedOsSchedulerRoute =
   AuthenticatedOsSchedulerRouteImport.update({
     id: '/scheduler',
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/os': typeof AuthenticatedOsRouteWithChildren
   '/os/analytics': typeof AuthenticatedOsAnalyticsRoute
+  '/os/autoscaling': typeof AuthenticatedOsAutoscalingRoute
   '/os/scheduler': typeof AuthenticatedOsSchedulerRoute
   '/os/settings': typeof AuthenticatedOsSettingsRoute
   '/os/tasks': typeof AuthenticatedOsTasksRoute
@@ -95,6 +103,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/os/analytics': typeof AuthenticatedOsAnalyticsRoute
+  '/os/autoscaling': typeof AuthenticatedOsAutoscalingRoute
   '/os/scheduler': typeof AuthenticatedOsSchedulerRoute
   '/os/settings': typeof AuthenticatedOsSettingsRoute
   '/os/tasks': typeof AuthenticatedOsTasksRoute
@@ -109,6 +118,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_authenticated/os': typeof AuthenticatedOsRouteWithChildren
   '/_authenticated/os/analytics': typeof AuthenticatedOsAnalyticsRoute
+  '/_authenticated/os/autoscaling': typeof AuthenticatedOsAutoscalingRoute
   '/_authenticated/os/scheduler': typeof AuthenticatedOsSchedulerRoute
   '/_authenticated/os/settings': typeof AuthenticatedOsSettingsRoute
   '/_authenticated/os/tasks': typeof AuthenticatedOsTasksRoute
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/os'
     | '/os/analytics'
+    | '/os/autoscaling'
     | '/os/scheduler'
     | '/os/settings'
     | '/os/tasks'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/os/analytics'
+    | '/os/autoscaling'
     | '/os/scheduler'
     | '/os/settings'
     | '/os/tasks'
@@ -147,6 +159,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authenticated/os'
     | '/_authenticated/os/analytics'
+    | '/_authenticated/os/autoscaling'
     | '/_authenticated/os/scheduler'
     | '/_authenticated/os/settings'
     | '/_authenticated/os/tasks'
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOsAnalyticsRouteImport
       parentRoute: typeof AuthenticatedOsRoute
     }
+    '/_authenticated/os/autoscaling': {
+      id: '/_authenticated/os/autoscaling'
+      path: '/autoscaling'
+      fullPath: '/os/autoscaling'
+      preLoaderRoute: typeof AuthenticatedOsAutoscalingRouteImport
+      parentRoute: typeof AuthenticatedOsRoute
+    }
     '/_authenticated/os/scheduler': {
       id: '/_authenticated/os/scheduler'
       path: '/scheduler'
@@ -245,6 +265,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedOsRouteChildren {
   AuthenticatedOsAnalyticsRoute: typeof AuthenticatedOsAnalyticsRoute
+  AuthenticatedOsAutoscalingRoute: typeof AuthenticatedOsAutoscalingRoute
   AuthenticatedOsSchedulerRoute: typeof AuthenticatedOsSchedulerRoute
   AuthenticatedOsSettingsRoute: typeof AuthenticatedOsSettingsRoute
   AuthenticatedOsTasksRoute: typeof AuthenticatedOsTasksRoute
@@ -254,6 +275,7 @@ interface AuthenticatedOsRouteChildren {
 
 const AuthenticatedOsRouteChildren: AuthenticatedOsRouteChildren = {
   AuthenticatedOsAnalyticsRoute: AuthenticatedOsAnalyticsRoute,
+  AuthenticatedOsAutoscalingRoute: AuthenticatedOsAutoscalingRoute,
   AuthenticatedOsSchedulerRoute: AuthenticatedOsSchedulerRoute,
   AuthenticatedOsSettingsRoute: AuthenticatedOsSettingsRoute,
   AuthenticatedOsTasksRoute: AuthenticatedOsTasksRoute,

@@ -9,7 +9,7 @@ class TaskCreate(BaseModel):
     ram_required: int = Field(gt=0)
     storage_required: int = Field(gt=0)
     command: str = Field(
-        default="echo CloudOS task executed successfully",
+        default="sleep 30",
         min_length=1,
         max_length=500,
     )

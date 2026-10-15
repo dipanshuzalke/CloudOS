@@ -26,6 +26,7 @@ from app.services.docker_service import (
     client,
     get_container_ip,
     get_container_uptime,
+    get_container_stats,
 )
 
 OS_IMAGES = {
@@ -198,6 +199,13 @@ def get_vms(
         ip = None
         uptime = None
 
+        cpu_percent = 0.0
+        memory_usage = 0
+        memory_limit = 0
+        memory_percent = 0.0
+        network_rx_bytes = 0
+        network_tx_bytes = 0
+
         if vm.container_id:
             try:
                 container = client.containers.get(
@@ -219,6 +227,18 @@ def get_vms(
                         container
                     )
 
+                    stats = get_container_stats(
+                        container
+                    )
+
+                    cpu_percent = stats["cpu_percent"]
+                    memory_usage = stats["memory_usage"]
+                    memory_limit = stats["memory_limit"]
+                    memory_percent = stats["memory_percent"]
+
+                    network_rx_bytes = stats["network_rx_bytes"]
+                    network_tx_bytes = stats["network_tx_bytes"]
+
                 else:
                     status = "stopped"
 
@@ -238,6 +258,16 @@ def get_vms(
             "ip": ip,
             "uptime": uptime,
             "container_id": vm.container_id,
+
+            "cpu_percent": cpu_percent,
+
+            "memory_usage": memory_usage,
+            "memory_limit": memory_limit,
+            "memory_percent": memory_percent,
+
+            "network_rx_bytes": network_rx_bytes,
+            "network_tx_bytes": network_tx_bytes,
+
             "created_at": vm.created_at,
         })
 

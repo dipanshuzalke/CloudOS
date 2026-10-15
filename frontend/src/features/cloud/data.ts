@@ -24,6 +24,16 @@ export interface VirtualMachine {
   uptime: string;
 
   containerId?: string;
+
+  // Real Docker runtime monitoring
+  cpuPercent: number;
+
+  memoryUsage: number;
+  memoryLimit: number;
+  memoryPercent: number;
+
+  networkRxBytes: number;
+  networkTxBytes: number;
 }
 
 export const virtualMachines: VirtualMachine[] = [

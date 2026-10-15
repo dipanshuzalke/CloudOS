@@ -58,6 +58,14 @@ export interface VMFromAPI {
   container_id: string | null;
 
   created_at: string;
+  cpu_percent: number;
+
+  memory_usage: number;
+  memory_limit: number;
+  memory_percent: number;
+
+  network_rx_bytes: number;
+  network_tx_bytes: number;
 }
 
 export interface CreateVMRequest {
@@ -123,6 +131,79 @@ export interface ComputeNodeFromAPI {
 
   status: string;
   created_at: string;
+}
+
+export interface VMMetricFromAPI {
+  vm_id: number;
+  vm_name: string;
+
+  allocated_cpu: number;
+  allocated_ram: number;
+
+  cpu_percent: number;
+  memory_usage: number;
+  memory_percent: number;
+
+  network_rx_bytes: number;
+  network_tx_bytes: number;
+
+  recorded_at: string;
+}
+
+
+export type AutoScalingConfig = {
+  id: number;
+  enabled: boolean;
+  cpu_threshold: number;
+  scale_up_cpu: number;
+  cooldown_seconds: number;
+  last_scaled_at: string | null;
+  updated_at: string;
+};
+
+export type AutoScalingConfigUpdate = {
+  enabled: boolean;
+  cpu_threshold: number;
+  scale_up_cpu: number;
+  cooldown_seconds: number;
+};
+
+export type AutoScalingCandidate = {
+  vm_id: number;
+  vm_name: string;
+  current_cpu_percent: number;
+  cpu_threshold: number;
+  allocated_cpu: number;
+  scale_up_cpu: number;
+};
+
+export type AutoScalingCheck = {
+  enabled: boolean;
+  candidates: AutoScalingCandidate[];
+  count: number;
+};
+
+
+
+export async function getAutoScalingConfig(): Promise<AutoScalingConfig> {
+  const response = await apiFetch("/api/autoscaling");
+  return response.json();
+}
+
+export async function updateAutoScalingConfig(
+  config: AutoScalingConfigUpdate,
+): Promise<AutoScalingConfig> {
+  const response = await apiFetch("/api/autoscaling", {
+    method: "PUT",
+    body: JSON.stringify(config),
+  });
+
+  return response.json();
+}
+
+export async function checkAutoScaling(): Promise<AutoScalingCheck> {
+  const response = await apiFetch("/api/autoscaling/check");
+  return response.json();
 }
 
 export async function getScheduler(): Promise<SchedulerResponse> {
@@ -463,6 +544,16 @@ export async function completeTask(
   return response.json();
 }
 
+export async function getVMMonitoring(
+  hours = 24,
+): Promise<VMMetricFromAPI[]> {
+  const response = await apiFetch(
+    `/api/monitoring/vms?hours=${hours}`,
+  );
+
+  return response.json();
+}
+
 /* =========================================================
    VM MAPPER
 ========================================================= */
@@ -520,5 +611,15 @@ export function mapVM(
     ...(vm.container_id !== null && {
       containerId: vm.container_id,
     }),
-  };
+
+    // Real Docker runtime monitoring
+    cpuPercent: vm.cpu_percent,
+
+    memoryUsage: vm.memory_usage,
+    memoryLimit: vm.memory_limit,
+    memoryPercent: vm.memory_percent,
+
+    networkRxBytes: vm.network_rx_bytes,
+    networkTxBytes: vm.network_tx_bytes,
+    };
 }

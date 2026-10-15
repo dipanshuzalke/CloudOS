@@ -337,3 +337,23 @@ def get_container_stats(container):
         raise RuntimeError(
             f"Failed to get container stats: {error}"
         )
+
+
+def update_vm_cpu_limit(container_id: str, cpu: int) -> None:
+    if cpu <= 0:
+        raise ValueError("CPU must be greater than zero")
+
+    try:
+        container = client.containers.get(container_id)
+
+        container.update(
+            nano_cpus=cpu * 1_000_000_000
+        )
+
+    except NotFound:
+        raise RuntimeError("Docker container not found")
+
+    except DockerException as error:
+        raise RuntimeError(
+            f"Failed to update container CPU limit: {error}"
+        )
